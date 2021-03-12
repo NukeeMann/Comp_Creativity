@@ -131,3 +131,4 @@ dmypy.json
 # .wav files may be too big
 
 music/*
+.ipynb_checkpoints/
