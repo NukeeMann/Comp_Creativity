@@ -1,1 +1,0 @@
-To get images you can use web scrapper: https://github.com/blejson/webscrapper it gets images from google images and resizes them to suitable size. Place them in one folder.
