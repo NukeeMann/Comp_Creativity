@@ -1,1 +1,7 @@
-To get images you can use web scrapper: https://github.com/blejson/webscrapper it gets images from google images and resizes them to suitable size. Place them in one folder.
+# Audio Feature Extarctor
+
+Class implementation to separate audio features extraction from main project.
+
+Available plots and extractions:
+- Spectrogram | dB per frequency per time
+- Waveplot | Loudness of audio
