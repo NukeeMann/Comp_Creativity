@@ -7,16 +7,22 @@ def main():
 
     # Declare and prepare Audio Feature Extractor class
     afe = AudioFtExt(audio_path)
-    # Convert audio to data format
-    afe.convertAudioToData()
-    # Show plot of loudness of audio
+
+    # Convert audio to data format. No need. Already done in __init__ function
+    #afe.convertAudioToData()
+
+    # Show plot of loudness of the audio
     afe.plotWave()
+
     # Convert audios data to spectrogram data using Fourier
     afe.getSpectrogramData()
+
     # Show plot of dB per Hz per second
     afe.plotSpectrogram()
-    # Detects beats momentum
+
+    # Detects beat
     afe.getRhythmData()
+
     # Saves data to .wav file with CLICK sound at detected beats momentum
     afe.saveAudio(True)
 
