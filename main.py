@@ -5,51 +5,61 @@ import moviepy.editor as mpe
 from audioFeatureExtractor import AudioFtExt
 import numpy as np
 
-audio_file = 'music/whitney.wav'
+audio_file = 'music/eminem2.wav'
 image_folder = 'images'
 video_name = 'video.avi'
 
-# default value is 22050. with different value beat times might not be accurate
+# data initialization
 afe = AudioFtExt(audio_file, hz_scale=22050)
 afe.getSpectrogramData()
-afe.getRhythmData(60)
+afe.getRhythmData(22050, 60)
 beat_times = afe.beat_data
 
-# ## functions that convert spectrogram to one value per one moment in time to easily use it in image procesing;
-# TODO: improve
+# creation of 2d array containing mean values of specific frequencies for each time stamp
 spec_data = afe.spec_data.T
-indexes = []
+freq = []
 arrSize = int(len(spec_data[0])/3)
 for i in range(len(spec_data)):
-    indexes.append([np.mean(spec_data[i][0:arrSize]),np.mean(spec_data[i][arrSize:2*arrSize]),np.mean(spec_data[i][2*arrSize:])])
-max_db = max(indexes)
-min_db = min(indexes)
-tmp_db = [(max_db[0] - min_db[0]),(max_db[1] - min_db[1]),(max_db[2] - min_db[2])]
-song_time = int(max(beat_times) * 100)
-print(song_time)
+    freq.append([np.mean(spec_data[i][0:arrSize]), np.mean(spec_data[i][arrSize:2*arrSize]), np.mean(spec_data[i][2*arrSize:])])
+
+# values that will be used in scaling
+max_db = max(freq)
+min_db = min(freq)
+delta_db = [(max_db[0] - min_db[0]), (max_db[1] - min_db[1]), (max_db[2] - min_db[2])]
+
 # create list of images and single frame (all images must be the same size to fit into created frame)
 images = [img for img in os.listdir(image_folder) if img.endswith(".JPEG")]
 frame = cv2.imread(os.path.join(image_folder, images[0]))
 height, width, layers = frame.shape
 
+# creation of video writer
 video = cv2.VideoWriter(video_name, 0, 100, (width, height))
+# we need to add last 'beat time' so this array covers whole video and not avoid last ~0.5s
+beat_times = np.append(beat_times, afe.duration_time)
+
 # attach images to frames
-i = 0.01
-frame_number = 0
-for image in images:
-    while i < beat_times[frame_number]:
-        tmp = i * 100 * len(indexes) / song_time
-        current_index = int(tmp)  # actual index from flatten spectrogram array
-        rgb = indexes[current_index]
-        rgb = [((rgb[0]-min_db[0])/tmp_db[0]) * 255,((rgb[1]-min_db[1])/tmp_db[1]) * 255,((rgb[2]-min_db[2])/tmp_db[2]) * 255]
-        rgbImage = np.zeros((frame.shape), np.uint8)
+number_of_frames = int(afe.duration_time * 100)
+image_number = 0
+for i in range(0, number_of_frames):
+    # if actual index (actual time) is grater that value corresponding to specific photo, we need to increment image index
+    if i/100 >= beat_times[image_number]:
+        image_number = image_number + 1
+    if image_number >= len(images):
+        break
+    # spectrogram array have different length than there is number of frames, that's why we need to scale index
+    current_index = int(i * len(freq) / number_of_frames)
+    rgb = freq[current_index]
+    rgb = [((rgb[0] - min_db[0]) / delta_db[0]) * 255, ((rgb[1] - min_db[1]) / delta_db[1]) * 255,
+           ((rgb[2] - min_db[2]) / delta_db[2]) * 255]
+    # TODO: combine it
+    # Change it to False if you want to create video that changes photo to the rhythm
+    if True:
+        rgbImage = np.zeros(frame.shape, np.uint8)
         # rgbImage[::] = (int(rgb[0]), int(rgb[1]), int(rgb[2]))
         rgbImage[::] = (100, 100, int(rgb[2]))
         video.write(rgbImage)
-        i = i + 0.01
-    frame_number = frame_number + 1
-    if frame_number >= len(beat_times):
-        break
+    else:
+        video.write(cv2.imread(os.path.join(image_folder, images[image_number])))
 
 cv2.destroyAllWindows()
 video.release()
