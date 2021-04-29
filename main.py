@@ -5,7 +5,7 @@ import moviepy.editor as mpe
 from audioFeatureExtractor import AudioFtExt
 import numpy as np
 
-audio_file = 'music/eminem2.wav'
+audio_file = 'music/whitney.wav'
 image_folder = 'images'
 video_name = 'video.avi'
 
@@ -56,7 +56,9 @@ for i in range(0, number_of_frames):
     if True:
         rgbImage = np.zeros(frame.shape, np.uint8)
         # rgbImage[::] = (int(rgb[0]), int(rgb[1]), int(rgb[2]))
-        rgbImage[::] = (100, 100, int(rgb[2]))
+        rgbImage[0:height//3:] = (255, 255, int(rgb[2]))
+        rgbImage[height//3:2*height//3:] = (255, int(rgb[1]), 255)
+        rgbImage[2*height//3::] = (int(rgb[0]), 255, 255)
         video.write(rgbImage)
     else:
         video.write(cv2.imread(os.path.join(image_folder, images[image_number])))
