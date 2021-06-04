@@ -3,6 +3,7 @@ import tkinter.ttk as ttk
 from algorithms.page1 import *
 from algorithms.page2 import *
 from algorithms.nowyAlgorytm import *
+from algorithms.styleTransfer import *
 
 
 class ButtonsFrame(tk.Frame):
@@ -107,7 +108,8 @@ if __name__ == "__main__":
     implemented_alg = {
         "Artistic Style Transfer": TestFrame1(app),
         "page2": TestFrame2(app),
-        "Nowy Algorytm": nowyAlg(app)
+        "Nowy Algorytm": nowyAlg(app),
+        "Style Transfer": styleTransfer(app)
     }
     # Create frames to show
     app.create(implemented_alg)
