@@ -53,7 +53,7 @@ for i in range(0, number_of_frames):
            ((rgb[2] - min_db[2]) / delta_db[2]) * 255]
     # TODO: combine it
     # Change it to False if you want to create video that changes photo to the rhythm
-    if True:
+    if False:
         rgbImage = np.zeros(frame.shape, np.uint8)
         # rgbImage[::] = (int(rgb[0]), int(rgb[1]), int(rgb[2]))
         rgbImage[0:height//3:] = (255, 255, int(rgb[2]))
@@ -61,7 +61,18 @@ for i in range(0, number_of_frames):
         rgbImage[2*height//3::] = (int(rgb[0]), 255, 255)
         video.write(rgbImage)
     else:
-        video.write(cv2.imread(os.path.join(image_folder, images[image_number])))
+        img1 = cv2.imread(os.path.join(image_folder, images[image_number]))
+        img2 = cv2.imread(os.path.join(image_folder, images[image_number + 1]))
+        if image_number == 0:
+            lastBeat = 0
+        else:
+            lastBeat = beat_times[image_number-1]
+        diff = (beat_times[image_number] - lastBeat)*100
+        alpha = 1 - (i - lastBeat*100)/diff
+        beta = 1 - alpha
+        output = cv2.addWeighted(img1, alpha, img2, beta, 0)
+        video.write(output)
+        print(alpha)
 
 cv2.destroyAllWindows()
 video.release()
