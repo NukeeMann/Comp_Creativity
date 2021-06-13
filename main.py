@@ -1,9 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from algorithms.page1 import *
+from algorithms.ArtisticStyleTransformation import *
 from algorithms.page2 import *
 from algorithms.nowyAlgorytm import *
-from algorithms.styleTransfer import *
 
 
 class ButtonsFrame(tk.Frame):
@@ -24,7 +23,7 @@ class ButtonsFrame(tk.Frame):
         # create a canvas object and a vertical scrollbar for scrolling it
         vscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         vscrollbar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
-        canvas = tk.Canvas(self, height=600, yscrollcommand=vscrollbar.set)
+        canvas = tk.Canvas(self, height=700, yscrollcommand=vscrollbar.set)
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.TRUE)
         vscrollbar.config(command=canvas.yview)
 
@@ -54,10 +53,10 @@ class ButtonsFrame(tk.Frame):
         canvas.bind('<Configure>', _configure_canvas)
 
         # Generate buttons
-        self.addButtons(container, parent, frames)
+        self.add_buttons(container, parent, frames)
 
     # Creating and adding buttons
-    def addButtons(self, container, parent, frames):
+    def add_buttons(self, container, parent, frames):
         # Generate dictionary of buttons
         for name in frames.keys():
             self.buttons[name] = ttk.Button(container,
@@ -73,7 +72,7 @@ class MainApplication(tk.Tk):
         super().__init__()
         # Set title and size of the window
         self.title("Computational Creativity")
-        self.geometry("1000x600")
+        self.geometry("1200x700")
 
         self.frames = {}
         self.button_frame = None
@@ -106,10 +105,9 @@ if __name__ == "__main__":
     app = MainApplication()
     # Add frames so that u can call them later
     implemented_alg = {
-        "Artistic Style Transfer": TestFrame1(app),
+        "Artistic Style Transfer": AST(app),
         "page2": TestFrame2(app),
-        "Nowy Algorytm": nowyAlg(app),
-        "Style Transfer": styleTransfer(app)
+        "Nowy Algorytm": nowyAlg(app)
     }
     # Create frames to show
     app.create(implemented_alg)
