@@ -5,6 +5,7 @@ from algorithms.slideshow import *
 from algorithms.ColorMix import *
 from algorithms.page2 import *
 from algorithms.nowyAlgorytm import *
+from algorithms.Morphing import *
 
 
 class ButtonsFrame(tk.Frame):
@@ -111,7 +112,8 @@ if __name__ == "__main__":
         "slideshow": Slideshow(app),
         "Color Mix": ColorMix(app),
         "page2": TestFrame2(app),
-        "Nowy Algorytm": nowyAlg(app)
+        "Nowy Algorytm": nowyAlg(app),
+        "Morphing": Morphing(app)
     }
     # Create frames to show
     app.create(implemented_alg)
