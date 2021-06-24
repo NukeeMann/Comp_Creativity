@@ -111,9 +111,9 @@ if __name__ == "__main__":
         "Artistic Style Transfer": AST(app),
         "slideshow": Slideshow(app),
         "Color Mix": ColorMix(app),
-        "page2": TestFrame2(app),
+        "Morphing": Morphing(app),
         "Nowy Algorytm": nowyAlg(app),
-        "Morphing": Morphing(app)
+        "page2": TestFrame2(app)
     }
     # Create frames to show
     app.create(implemented_alg)
