@@ -8,6 +8,7 @@ from algorithms.audioFeatureExtractor import AudioFtExt
 
 
 class Slideshow(tk.Frame):
+    # Browse audio file
     def browse_audio(self):
         self.audio_file = filedialog.askopenfilename(initialdir="/",
                                                 title="Select a File",
@@ -17,16 +18,19 @@ class Slideshow(tk.Frame):
                                                             "*.*")))
         tk.Label(self, text=self.audio_file).grid(row=1, column=0)
 
+    # Browse folder containing photos to generate video from
     def browse_folder(self):
         self.image_folder = filedialog.askdirectory(initialdir="/", title='Please select a directory')
         tk.Label(self, text=self.image_folder).grid(row=3, column=0)
 
+    # Creation of slideshow from folder with photos and audio file
     def create_slideshow(self):
         video_name = 'video.avi'
         afe = AudioFtExt(self.audio_file, hz_scale=22050)
         afe.getSpectrogramData()
         afe.getRhythmData(22050, 60)
         beat_times = afe.beat_data
+        # Loading images from folder
         images = [img for img in os.listdir(self.image_folder) if img.endswith(".jpeg") or img.endswith(".jpg") or img.endswith(".JPEG") or img.endswith(".JPG")]
         frame = cv2.imread(os.path.join(self.image_folder, images[0]))
         height, width, layers = frame.shape
@@ -34,6 +38,7 @@ class Slideshow(tk.Frame):
         beat_times = np.append(beat_times, afe.duration_time)
         number_of_frames = int(afe.duration_time * 100)
         image_number = 0
+        # creation of the video, applying images to the frames
         for i in range(0, number_of_frames):
             # if actual index (actual time) is grater that value corresponding to specific photo, we need to increment image index
             if i / 100 >= beat_times[image_number]:
@@ -46,11 +51,13 @@ class Slideshow(tk.Frame):
                 lastBeat = 0
             else:
                 lastBeat = beat_times[image_number - 1]
+            # Smooth transition
             diff = (beat_times[image_number] - lastBeat) * 100
             alpha = 1 - (i - lastBeat * 100) / diff
             beta = 1 - alpha
             output = cv2.addWeighted(img1, alpha, img2, beta, 0)
             video.write(output)
+        # Mixing music with the picture and creating final video
         cv2.destroyAllWindows()
         video.release()
         audio = mpe.AudioFileClip(self.audio_file)
