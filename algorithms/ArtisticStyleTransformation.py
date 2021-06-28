@@ -24,7 +24,7 @@ class AST(tk.Frame):
         self.max_dim.set(self.choices[0])
         self.choosebox = tk.OptionMenu(self, self.max_dim, *self.choices).grid(row=5, column=0)
 
-
+    # Browse image to transform
     def browse_image(self):
         self.image_file = filedialog.askopenfilename(initialdir="/",
                                                      title="Select a File",
@@ -34,6 +34,7 @@ class AST(tk.Frame):
                                                                 ("all files", "*.*")))
         tk.Label(self, text=self.image_file).grid(row=1, column=0)
 
+    # Browse image to get style from
     def browse_style(self):
         self.style_file = filedialog.askopenfilename(initialdir="/",
                                                      title="Select a File",
@@ -43,15 +44,20 @@ class AST(tk.Frame):
                                                                 ("all files", "*.*")))
         tk.Label(self, text=self.style_file).grid(row=3, column=0)
 
-
+    # Transform image
     def transform(self):
         if self.image_file != '' and self.style_file != '':
+            tf.compat.v1.enable_eager_execution()
+            # Download model from tensorflow hub
             hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+            # Load images
             content_image = self.load_img(self.image_file)
             style_image = self.load_img(self.style_file, self.max_dim.get())
+            # Transform image
             stylized_image = hub_model(tf.constant(content_image), tf.constant(style_image))[0]
             output_img = self.tensor_to_image(stylized_image)
 
+            # Show transformed image
             output_img = ImageTk.PhotoImage(output_img)
             label = tk.Label(self, image=output_img)
             label.image = output_img
@@ -60,7 +66,7 @@ class AST(tk.Frame):
     @staticmethod
     def load_img(path_to_img, max_dim=512):
         img = tf.io.read_file(path_to_img)
-        img = tf.image.decode_image(img, channels=3)
+        img = tf.image.decode_image(img, channels=3, expand_animations=False)
         img = tf.image.convert_image_dtype(img, tf.float32)
 
         shape = tf.cast(tf.shape(img)[:-1], tf.float32)

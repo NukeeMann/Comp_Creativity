@@ -9,12 +9,23 @@ import PIL.Image
 from scipy.stats import truncnorm
 import tensorflow_hub as hub
 
+
 class Morphing(tk.Frame):
     num_samples = 1
     num_interps = 100
     truncation = 0.2
     noise_seed_A = 0
     noise_seed_B = 0
+
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        tk.Label(self, text="Img number:").grid(row=0, column=0)
+        self.x1 = tk.Entry(self, bd=5)
+        self.x1.grid(row=0, column=1)
+        tk.Label(self, text="Img number:").grid(row=1, column=0)
+        self.x2 = tk.Entry(self, bd=5)
+        self.x2.grid(row=1, column=1)
+        tk.Button(self, text='Generate!', command=self.create_morphing).grid(row=4, column=0)
 
     def truncated_z_sample(self, batch_size, truncation=1., seed=None):
         state = None if seed is None else np.random.RandomState(seed)
@@ -105,14 +116,3 @@ class Morphing(tk.Frame):
         video = mpe.VideoFileClip(video_name)
         video.write_videofile("output.mp4", fps=50)
         os.startfile("output.mp4")
-
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        tk.Label(self, text="Img number:").grid(row=0, column=0)
-        self.x1 = tk.Entry(self, bd=5)
-        self.x1.grid(row=0, column=1)
-        tk.Label(self, text="Img number:").grid(row=1, column=0)
-        self.x2 = tk.Entry(self, bd=5)
-        self.x2.grid(row=1, column=1)
-        tk.Button(self, text='Generate!', command=self.create_morphing).grid(row=4, column=0)
-

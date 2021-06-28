@@ -1,10 +1,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from algorithms.ArtisticStyleTransformation import *
-from algorithms.slideshow import *
+from algorithms.Slideshow import *
 from algorithms.ColorMix import *
-from algorithms.page2 import *
-from algorithms.nowyAlgorytm import *
 from algorithms.Morphing import *
 
 
@@ -109,11 +107,9 @@ if __name__ == "__main__":
     # Add frames so that u can call them later
     implemented_alg = {
         "Artistic Style Transfer": AST(app),
-        "slideshow": Slideshow(app),
+        "Slideshow": Slideshow(app),
         "Color Mix": ColorMix(app),
-        "Morphing": Morphing(app),
-        "Nowy Algorytm": nowyAlg(app),
-        "page2": TestFrame2(app)
+        "Morphing": Morphing(app)
     }
     # Create frames to show
     app.create(implemented_alg)

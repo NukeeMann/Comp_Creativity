@@ -8,6 +8,19 @@ from algorithms.audioFeatureExtractor import AudioFtExt
 
 
 class ColorMix(tk.Frame):
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent)
+        self.audio_file = ''
+        tk.Button(self, text='Browse audio file', command=self.browse_audio).grid(row=0, column=0)
+        tk.Label(self, text='').grid(row=1, column=0)
+        self.x1 = tk.Entry(self)
+        self.x1.grid(row=2, column=0)
+        self.x2 = tk.Entry(self)
+        self.x2.grid(row=2, column=1)
+        self.x3 = tk.Entry(self)
+        self.x3.grid(row=2, column=2)
+        tk.Button(self, text='Color Mix', command=self.generate).grid(row=3, column=0)
+
     def browse_audio(self):
         self.audio_file = filedialog.askopenfilename(initialdir="/",
                                                 title="Select a File",
@@ -53,17 +66,3 @@ class ColorMix(tk.Frame):
         final = video.set_audio(audio)
         final.write_videofile("output.mp4", fps=100)
         os.startfile("output.mp4")
-
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.audio_file = ''
-        tk.Button(self, text='Browse audio file', command=self.browse_audio).grid(row=0, column=0)
-        tk.Label(self, text='').grid(row=1, column=0)
-        self.x1 = tk.Entry(self)
-        self.x1.grid(row=2, column=0)
-        self.x2 = tk.Entry(self)
-        self.x2.grid(row=2, column=1)
-        self.x3 = tk.Entry(self)
-        self.x3.grid(row=2, column=2)
-        tk.Button(self, text='Color Mix', command=self.generate).grid(row=3, column=0)
-

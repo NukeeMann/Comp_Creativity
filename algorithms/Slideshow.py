@@ -5,6 +5,8 @@ import os
 import moviepy.editor as mpe
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
+
+
 class Slideshow(tk.Frame):
     def browse_audio(self):
         self.audio_file = filedialog.askopenfilename(initialdir="/",
