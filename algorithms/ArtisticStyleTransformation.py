@@ -11,18 +11,33 @@ os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 
 class AST(tk.Frame):
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
+        tk.Frame.__init__(self, parent, highlightbackground="blue", highlightthickness=1)
         self.image_file = ''
         self.style_file = ''
-        self.button1 = tk.Button(self, text='Browse content image', command=self.browse_image).grid(row=0, column=0)
-        self.label1 = tk.Label(self, text='').grid(row=1, column=0)
-        self.button2 = tk.Button(self, text='Browse style image', command=self.browse_style).grid(row=2, column=0)
-        self.label2 = tk.Label(self, text='').grid(row=3, column=0)
-        self.button3 = tk.Button(self, text='Transfer style', command=self.transform).grid(row=4, column=0)
+        top_padding = 400
         self.choices = [256, 512, 1024, 2048, 4096]
         self.max_dim = tk.IntVar(self)
         self.max_dim.set(self.choices[0])
-        self.choosebox = tk.OptionMenu(self, self.max_dim, *self.choices).grid(row=5, column=0)
+        self.preview_image = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 80), fg='white',
+                                      background="black").place(
+                                        x=140, y=20, height=360, width=640)
+        self.label1 = tk.Label(self, text='LABRADORy.png', font=44, background="lightgrey").place(
+                                        x=60, y=top_padding + 20, height=40, width=400)
+        self.button1 = tk.Button(self, text='Browse content image', font=44, command=self.browse_image).place(
+                                        x=460, y=top_padding + 20, height=40, width=400)
+
+        self.label2 = tk.Label(self, text='wan_gog.png', font=44, background="lightgrey").place(
+                                        x=60, y=top_padding + 61, height=40, width=400)
+        self.button2 = tk.Button(self, text='Browse style image', font=44, command=self.browse_style).place(
+                                        x=460, y=top_padding + 61, height=40, width=400)
+
+        self.choose_box = tk.OptionMenu(self, self.max_dim, *self.choices)
+        self.choose_box.config(font=44)
+        dropdown = self.nametowidget(self.choose_box.menuname).config(font=44)
+        self.choose_box.place(x=60, y=top_padding + 102, height=40, width=400)
+
+        self.button3 = tk.Button(self, text='Transfer style', font=44, command=self.transform).place(
+                                        x=460, y=top_padding + 102, height=40, width=400)
 
     # Browse image to transform
     def browse_image(self):
@@ -48,8 +63,8 @@ class AST(tk.Frame):
     def transform(self):
         if self.image_file != '' and self.style_file != '':
             tf.compat.v1.enable_eager_execution()
-            # Download model from tensorflow hub
-            hub_model = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
+            # Load the model
+            hub_model = hub.load('algorithms/models/ATS')
             # Load images
             content_image = self.load_img(self.image_file)
             style_image = self.load_img(self.style_file, self.max_dim.get())

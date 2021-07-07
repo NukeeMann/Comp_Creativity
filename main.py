@@ -85,14 +85,14 @@ class MainApplication(tk.Tk):
         # Show first frame and buttons
         self.show_frame("Artistic Style Transfer")
         self.button_frame = ButtonsFrame(self, self.frames)
-        self.button_frame.grid(row=0, column=0, rowspan=3, columnspan=1, sticky='nsew')
+        self.button_frame.grid(row=0, column=0, rowspan=1, columnspan=1, sticky='nsew')
 
     # Configure algorithm frames
     @staticmethod
     def generate_frames(frames):
         # Set grid so that frames do not overlap buttons
         for frame in frames.keys():
-            frames[frame].grid(row=0, column=10, rowspan=30, columnspan=3, sticky='nsew')
+            frames[frame].place(x=281, y=0, anchor="nw", width=919, height=700)
 
         return frames
 
