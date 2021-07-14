@@ -70,10 +70,21 @@ class Slideshow(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.audio_file = ''
         self.image_folder = ''
-        tk.Button(self, text='Browse audio file', command=self.browse_audio).grid(row=0, column=0)
+        top_padding = 50
+        tk.Label(self, text='').grid(row=0, column=0)
         tk.Label(self, text='').grid(row=1, column=0)
-        tk.Button(self, text='Browse folder with images', command=self.browse_folder).grid(row=2, column=0)
-        tk.Label(self, text='').grid(row=3, column=0)
-        tk.Button(self, text='Create slideshow', command=self.create_slideshow).grid(row=4, column=0)
+
+        self.label1 = tk.Label(self, text='eminem.wav', font=44, background="lightgrey").place(
+                                        x=60, y=top_padding + 20, height=40, width=400)
+        self.button1 = tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(
+                                        x=460, y=top_padding + 20, height=40, width=400)
+
+        self.label2 = tk.Label(self, text='/images', font=44, background="lightgrey").place(
+                                        x=60, y=top_padding + 61, height=40, width=400)
+        self.button2 = tk.Button(self, text='Browse folder with images', font=44, command=self.browse_folder).place(
+                                        x=460, y=top_padding + 61, height=40, width=400)
+        self.button3 = tk.Button(self, text='Create slideshow', font=44, command=self.create_slideshow).place(
+                                        x=60, y=top_padding + 102, height=40, width=800)
+
 
 
