@@ -18,13 +18,18 @@ class Morphing(tk.Frame):
 
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
-        tk.Label(self, text="Img number:").grid(row=0, column=0)
-        self.x1 = tk.Entry(self, bd=5)
-        self.x1.grid(row=0, column=1)
-        tk.Label(self, text="Img number:").grid(row=1, column=0)
-        self.x2 = tk.Entry(self, bd=5)
-        self.x2.grid(row=1, column=1)
-        tk.Button(self, text='Generate!', command=self.create_morphing).grid(row=4, column=0)
+        top_padding = 50
+        self.x1 = tk.Entry(self, bd=5, font=44, justify='center')
+        self.x1.place(x=460, y=top_padding + 20, height=40, width=400)
+        self.x2 = tk.Entry(self, bd=5, font=44, justify='center')
+        self.x2.place(x=460, y=top_padding + 61, height=40, width=400)
+
+        self.label1 = tk.Label(self, text='Img number:', font=44, background="lightgrey").place(x=60, y=top_padding + 20, height=40, width=400)
+        self.label2 = tk.Label(self, text='Img number:', font=44, background="lightgrey").place(
+            x=60, y=top_padding + 61, height=40, width=400)
+        self.button3 = tk.Button(self, text='Generate!', font=44, command=self.create_morphing).place(
+                                        x=60, y=top_padding + 102, height=40, width=800)
+
 
     def truncated_z_sample(self, batch_size, truncation=1., seed=None):
         state = None if seed is None else np.random.RandomState(seed)

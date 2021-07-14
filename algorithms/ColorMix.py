@@ -11,17 +11,19 @@ class ColorMix(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.audio_file = ''
-        tk.Button(self, text='Browse audio file', command=self.browse_audio).grid(row=0, column=0)
-        tk.Label(self, text='').grid(row=1, column=0)
+        top_padding = 50
+        tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(x=460, y=top_padding + 20, height=40, width=400)
+        self.label1 = tk.Label(self, text='eminem.wav', font=44, background="lightgrey").place(
+            x=60, y=top_padding + 20, height=40, width=400)
         # x1, x2, x3 are components of RGB color which is basis of video, each 1/3 part of frame will be generated from
         # this color with mixed one of those components
-        self.x1 = tk.Entry(self)
-        self.x1.grid(row=2, column=0)
-        self.x2 = tk.Entry(self)
-        self.x2.grid(row=2, column=1)
-        self.x3 = tk.Entry(self)
-        self.x3.grid(row=2, column=2)
-        tk.Button(self, text='Color Mix', command=self.generate).grid(row=3, column=0)
+        self.x1 = tk.Entry(self, font=44, justify='center')
+        self.x1.place(x=60, y=top_padding + 61, height=40, width=266)
+        self.x2 = tk.Entry(self, font=44, justify='center')
+        self.x2.place(x=327, y=top_padding + 61, height=40, width=266)
+        self.x3 = tk.Entry(self, font=44, justify='center')
+        self.x3.place(x=594, y=top_padding + 61, height=40, width=266)
+        tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=top_padding + 102, height=40, width=800)
 
     # Browse audio file
     def browse_audio(self):
