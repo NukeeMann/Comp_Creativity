@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 from tkinter.messagebox import showerror
 import os
@@ -5,19 +6,37 @@ import tensorflow as tf
 from tkinter import filedialog
 import tensorflow_hub as hub
 import numpy as np
+from threading import Thread
+from concurrent.futures import Future
 from PIL import Image, ImageTk
 
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 
 
-# noinspection DuplicatedCode
+def call_with_future(fn, future, args, kwargs):
+    try:
+        result = fn(*args, **kwargs)
+        future.set_result(result)
+    except Exception as exc:
+        future.set_exception(exc)
+
+
+def threaded(fn):
+    def wrapper(*args, **kwargs):
+        future = Future()
+        Thread(target=call_with_future, args=(fn, future, args, kwargs)).start()
+        return future
+    return wrapper
+
+
 class AST(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent, highlightbackground="blue", highlightthickness=1)
         self.image_file = ''
         self.style_file = ''
         self.result = None
+        self.hub_model = None
         top_padding = 530
 
         self.preview_image = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 80), fg='white', background="black")
@@ -29,13 +48,13 @@ class AST(tk.Frame):
                                          background="grey")
         self.tmp_style_slider.place(x=9, y=420, height=120, width=900)
 
-        self.label_cont_img = tk.Label(self, text='LABRADORy.png', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_cont_img = tk.Label(self, text='', font=("TkDefaultFont", 12), background="lightgrey")
         self.label_cont_img.place(x=255, y=top_padding + 20, height=40, width=200)
         self.button_cont_img = tk.Button(self, text='Browse content image', font=("TkDefaultFont", 12),
                                          command=self.browse_image)
         self.button_cont_img.place(x=55, y=top_padding + 20, height=40, width=200)
 
-        self.label_style_img = tk.Label(self, text='wan_gog.png', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_style_img = tk.Label(self, text='', font=("TkDefaultFont", 12), background="lightgrey")
         self.label_style_img.place(x=255, y=top_padding + 62, height=40, width=200)
         self.button_style_img = tk.Button(self, text='Browse style image', font=("TkDefaultFont", 12),
                                           command=self.browse_style)
@@ -56,6 +75,9 @@ class AST(tk.Frame):
 
         self.button_save = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_image)
         self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
+
+        # Load the model
+        self.load_model_h = self.loadModel()
 
     # Browse image to transform
     def browse_image(self):
@@ -92,14 +114,14 @@ class AST(tk.Frame):
             tk.messagebox.showerror(title="Error", message="Select style image first.")
             return
 
-        tf.compat.v1.enable_eager_execution()
-        # Load the model
-        hub_model = hub.load('algorithms/models/ATS')
+        # Check if model is loaded
+        self.load_model_h.result()
+
         # Load images
         content_image = self.load_img(self.image_file)
         style_image = self.load_img(self.style_file, self.max_dim.get())
         # Transform image
-        stylized_image = hub_model(tf.constant(content_image), tf.constant(style_image))[0]
+        stylized_image = self.hub_model(tf.constant(content_image), tf.constant(style_image))[0]
         output_img = self.tensor_to_image(stylized_image)
         self.result = output_img
 
@@ -122,6 +144,12 @@ class AST(tk.Frame):
         if not filename:
             return
         self.result.save(filename)
+
+    @threaded
+    def loadModel(self):
+        tf.compat.v1.enable_eager_execution()
+        # Load the model
+        self.hub_model = hub.load('algorithms/models/ATS')
 
     @staticmethod
     def load_img(path_to_img, max_dim=0):
