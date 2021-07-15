@@ -74,7 +74,7 @@ class MainApplication(tk.Tk):
         # Set title and size of the window
         self.title("Computational Creativity")
         self.geometry("1200x700")
-
+        self.resizable(False, False)
         self.frames = {}
         self.button_frame = None
 

@@ -1,92 +1,140 @@
 import tkinter as tk
+from tkinter.messagebox import showerror
 import os
 import tensorflow as tf
 from tkinter import filedialog
 import tensorflow_hub as hub
 import numpy as np
 from PIL import Image, ImageTk
+
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 
 
+# noinspection DuplicatedCode
 class AST(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent, highlightbackground="blue", highlightthickness=1)
         self.image_file = ''
         self.style_file = ''
-        top_padding = 400
+        self.result = None
+        top_padding = 530
+
+        self.preview_image = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 80), fg='white', background="black")
+        self.preview_image.place(x=140, y=20, height=360, width=640)
+
+        self.label_select_styl = tk.Label(self, text='Select style: ', font=("TkDefaultFont", 16))
+        self.label_select_styl.place(x=10, y=390, height=30, width=120)
+        self.tmp_style_slider = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 40), fg='white',
+                                         background="grey")
+        self.tmp_style_slider.place(x=9, y=420, height=120, width=900)
+
+        self.label_cont_img = tk.Label(self, text='LABRADORy.png', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_cont_img.place(x=255, y=top_padding + 20, height=40, width=200)
+        self.button_cont_img = tk.Button(self, text='Browse content image', font=("TkDefaultFont", 12),
+                                         command=self.browse_image)
+        self.button_cont_img.place(x=55, y=top_padding + 20, height=40, width=200)
+
+        self.label_style_img = tk.Label(self, text='wan_gog.png', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_style_img.place(x=255, y=top_padding + 62, height=40, width=200)
+        self.button_style_img = tk.Button(self, text='Browse style image', font=("TkDefaultFont", 12),
+                                          command=self.browse_style)
+        self.button_style_img.place(x=55, y=top_padding + 62, height=40, width=200)
+
         self.choices = [256, 512, 1024, 2048, 4096]
         self.max_dim = tk.IntVar(self)
         self.max_dim.set(self.choices[0])
-        self.preview_image = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 80), fg='white',
-                                      background="black").place(
-                                        x=140, y=20, height=360, width=640)
-        self.label1 = tk.Label(self, text='LABRADORy.png', font=44, background="lightgrey").place(
-                                        x=60, y=top_padding + 20, height=40, width=400)
-        self.button1 = tk.Button(self, text='Browse content image', font=44, command=self.browse_image).place(
-                                        x=460, y=top_padding + 20, height=40, width=400)
+        self.label_param = tk.Label(self, text='Select sampling size:', font=("TkDefaultFont", 12))
+        self.label_param.place(x=55, y=top_padding + 104, height=40, width=200)
+        self.choose_box_param = tk.OptionMenu(self, self.max_dim, *self.choices)
+        self.choose_box_param.config(font=("TkDefaultFont", 12))
+        dropdown = self.nametowidget(self.choose_box_param.menuname).config(font=("TkDefaultFont", 12))
+        self.choose_box_param.place(x=255, y=top_padding + 104, height=40, width=200)
 
-        self.label2 = tk.Label(self, text='wan_gog.png', font=44, background="lightgrey").place(
-                                        x=60, y=top_padding + 61, height=40, width=400)
-        self.button2 = tk.Button(self, text='Browse style image', font=44, command=self.browse_style).place(
-                                        x=460, y=top_padding + 61, height=40, width=400)
+        self.button_transform = tk.Button(self, text='Transfer image', font=44, command=self.transform)
+        self.button_transform.place(x=465, y=top_padding + 20, height=60, width=400)
 
-        self.choose_box = tk.OptionMenu(self, self.max_dim, *self.choices)
-        self.choose_box.config(font=44)
-        dropdown = self.nametowidget(self.choose_box.menuname).config(font=44)
-        self.choose_box.place(x=60, y=top_padding + 102, height=40, width=400)
-
-        self.button3 = tk.Button(self, text='Transfer style', font=44, command=self.transform).place(
-                                        x=460, y=top_padding + 102, height=40, width=400)
+        self.button_save = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_image)
+        self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
 
     # Browse image to transform
     def browse_image(self):
-        self.image_file = filedialog.askopenfilename(initialdir="/",
-                                                     title="Select a File",
-                                                     filetypes=(("jpeg files", "*.jpg"),
-                                                                ("gif files", "*.gif*"),
-                                                                ("png files", "*.png"),
-                                                                ("all files", "*.*")))
-        tk.Label(self, text=self.image_file).grid(row=1, column=0)
+        selected_content = filedialog.askopenfilename(initialdir="/",
+                                                      title="Select a File",
+                                                      filetypes=(("jpeg files", "*.jpg"),
+                                                                 ("gif files", "*.gif*"),
+                                                                 ("png files", "*.png"),
+                                                                 ("all files", "*.*")))
+
+        if selected_content:
+            self.image_file = selected_content
+            self.label_cont_img.config(text=os.path.basename(self.image_file))
 
     # Browse image to get style from
     def browse_style(self):
-        self.style_file = filedialog.askopenfilename(initialdir="/",
-                                                     title="Select a File",
-                                                     filetypes=(("jpeg files", "*.jpg"),
-                                                                ("gif files", "*.gif*"),
-                                                                ("png files", "*.png"),
-                                                                ("all files", "*.*")))
-        tk.Label(self, text=self.style_file).grid(row=3, column=0)
+        selected_style = filedialog.askopenfilename(initialdir="/",
+                                                    title="Select a File",
+                                                    filetypes=(("jpeg files", "*.jpg"),
+                                                               ("gif files", "*.gif*"),
+                                                               ("png files", "*.png"),
+                                                               ("all files", "*.*")))
+
+        if selected_style:
+            self.style_file = selected_style
+            self.label_style_img.config(text=os.path.basename(self.style_file))
 
     # Transform image
     def transform(self):
-        if self.image_file != '' and self.style_file != '':
-            tf.compat.v1.enable_eager_execution()
-            # Load the model
-            hub_model = hub.load('algorithms/models/ATS')
-            # Load images
-            content_image = self.load_img(self.image_file)
-            style_image = self.load_img(self.style_file, self.max_dim.get())
-            # Transform image
-            stylized_image = hub_model(tf.constant(content_image), tf.constant(style_image))[0]
-            output_img = self.tensor_to_image(stylized_image)
+        if self.image_file == '':
+            tk.messagebox.showerror(title="Error", message="Select content image first.")
+            return
+        elif self.style_file == '':
+            tk.messagebox.showerror(title="Error", message="Select style image first.")
+            return
 
-            # Show transformed image
-            output_img = ImageTk.PhotoImage(output_img)
-            label = tk.Label(self, image=output_img)
-            label.image = output_img
-            label.grid(row=7, column=0)
+        tf.compat.v1.enable_eager_execution()
+        # Load the model
+        hub_model = hub.load('algorithms/models/ATS')
+        # Load images
+        content_image = self.load_img(self.image_file)
+        style_image = self.load_img(self.style_file, self.max_dim.get())
+        # Transform image
+        stylized_image = hub_model(tf.constant(content_image), tf.constant(style_image))[0]
+        output_img = self.tensor_to_image(stylized_image)
+        self.result = output_img
+
+        # Show transformed image
+        output_img = self.resizeImg(output_img)
+        output_img = ImageTk.PhotoImage(output_img)
+        self.preview_image.config(image=output_img)
+        self.preview_image.image = output_img
+        self.preview_image.place(x=(920 - output_img.width()) / 2, y=20, height=output_img.height(),
+                                 width=output_img.width())
+
+    def save_image(self):
+        if self.result is None:
+            tk.messagebox.showerror(title="Error", message="There is nothing to save. Transfer an image first.")
+            return
+
+        filename = filedialog.asksaveasfile(mode='wb', defaultextension=".jpg", filetypes=(("JPEG", "*.jpg"),
+                                                                                           ("PNG", "*.png"),
+                                                                                           ("all files", "*.*")))
+        if not filename:
+            return
+        self.result.save(filename)
 
     @staticmethod
-    def load_img(path_to_img, max_dim=512):
+    def load_img(path_to_img, max_dim=0):
         img = tf.io.read_file(path_to_img)
         img = tf.image.decode_image(img, channels=3, expand_animations=False)
         img = tf.image.convert_image_dtype(img, tf.float32)
 
         shape = tf.cast(tf.shape(img)[:-1], tf.float32)
-        long_dim = max(shape)
-        scale = max_dim / long_dim
+        if max_dim != 0:
+            long_dim = max(shape)
+            scale = max_dim / long_dim
+        else:
+            scale = 1
 
         new_shape = tf.cast(shape * scale, tf.int32)
 
@@ -102,3 +150,21 @@ class AST(tk.Frame):
             assert tensor.shape[0] == 1
             tensor = tensor[0]
         return Image.fromarray(tensor)
+
+    @staticmethod
+    def resizeImg(img):
+        width, height = img.size
+        scale_h = height / 360
+        scale_w = width / 640
+
+        if scale_w <= 1.0 and scale_h <= 1.0:
+            return img
+
+        if scale_h > scale_w:
+            height = int(height / scale_h)
+            width = int(width / scale_h)
+        else:
+            height = int(height / scale_w)
+            width = int(width / scale_w)
+
+        return img.resize((width, height), Image.ANTIALIAS)
