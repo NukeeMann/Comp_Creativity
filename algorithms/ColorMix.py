@@ -5,6 +5,7 @@ import os
 import moviepy.editor as mpe
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
+from tkinter.messagebox import showerror
 
 
 class ColorMix(tk.Frame):
@@ -12,9 +13,9 @@ class ColorMix(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.audio_file = ''
         top_padding = 50
-        tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(x=460, y=top_padding + 20, height=40, width=400)
-        self.label1 = tk.Label(self, text='eminem.wav', font=44, background="lightgrey").place(
+        tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(
             x=60, y=top_padding + 20, height=40, width=400)
+        self.label1 = tk.Label(self, text='eminem.wav', font=44, background="lightgrey").place(x=460, y=top_padding + 20, height=40, width=400)
         # x1, x2, x3 are components of RGB color which is basis of video, each 1/3 part of frame will be generated from
         # this color with mixed one of those components
         self.x1 = tk.Entry(self, font=44, justify='center')
@@ -37,6 +38,12 @@ class ColorMix(tk.Frame):
 
     # Generate video from audio file
     def generate(self):
+        if self.audio_file == '':
+            tk.messagebox.showerror(title="Error", message="Select audio file first.")
+            return
+        if self.x1.get() == '' or self.x2.get() == '' or self.x3.get() == '':
+            tk.messagebox.showerror(title="Error", message="Select RGB color first.")
+            return
         video_name = 'video.avi'
         afe = AudioFtExt(self.audio_file, hz_scale=22050)
         afe.getSpectrogramData()
