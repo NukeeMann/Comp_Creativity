@@ -9,7 +9,8 @@ __pycache__/
 .idea/
 # C extensions
 *.so
-
+*.mp4
+*.avi
 # Distribution / packaging
 .Python
 build/
