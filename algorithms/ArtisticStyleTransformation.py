@@ -77,6 +77,7 @@ class AST(tk.Frame):
         self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
 
         # Load the model
+        tf.compat.v1.enable_eager_execution()
         self.load_model_h = self.loadModel()
 
     # Browse image to transform
@@ -114,6 +115,7 @@ class AST(tk.Frame):
             tk.messagebox.showerror(title="Error", message="Select style image first.")
             return
 
+        tf.compat.v1.enable_eager_execution()
         # Check if model is loaded
         self.load_model_h.result()
 
