@@ -67,7 +67,7 @@ class AST(tk.Frame):
         self.label_param.place(x=55, y=top_padding + 104, height=40, width=200)
         self.choose_box_param = tk.OptionMenu(self, self.max_dim, *self.choices)
         self.choose_box_param.config(font=("TkDefaultFont", 12))
-        dropdown = self.nametowidget(self.choose_box_param.menuname).config(font=("TkDefaultFont", 12))
+        self.nametowidget(self.choose_box_param.menuname).config(font=("TkDefaultFont", 12))
         self.choose_box_param.place(x=255, y=top_padding + 104, height=40, width=200)
 
         self.button_transform = tk.Button(self, text='Transfer image', font=44, command=self.transform)
@@ -77,6 +77,7 @@ class AST(tk.Frame):
         self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
 
         # Load the model
+        tf.compat.v1.enable_eager_execution()
         self.load_model_h = self.loadModel()
 
     # Browse image to transform
@@ -114,6 +115,7 @@ class AST(tk.Frame):
             tk.messagebox.showerror(title="Error", message="Select style image first.")
             return
 
+        tf.compat.v1.enable_eager_execution()
         # Check if model is loaded
         self.load_model_h.result()
 
