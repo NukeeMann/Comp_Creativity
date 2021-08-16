@@ -3,7 +3,6 @@ from tkinter import filedialog
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 import cv2
-import os
 import moviepy.editor as mpe
 import numpy as np
 from scipy.stats import truncnorm
@@ -12,6 +11,11 @@ from tkinter.messagebox import showerror
 from threading import Thread
 from concurrent.futures import Future
 import algorithms.MorphingLabels as MorphingLabels
+import tarfile, os, requests
+from os import path
+
+# Load compressed models from tensorflow_hub
+os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
 
 def call_with_future(fn, future, args, kwargs):
     try:
@@ -68,10 +72,22 @@ class Morphing(tk.Frame):
 
     @threaded
     def loadModel(self):
-        self.module_path = "https://tfhub.dev/deepmind/biggan-deep-128/1"   # 256 doesn't work  for some reason
+        tmp_path = os.path.join("algorithms", "models", "MORPHING")
+        file_name = os.path.join("algorithms", "models", "MORPHING", "tmp.tar.gz")
+        if not path.exists(tmp_path):
+            os.mkdir(tmp_path)
+            url = 'https://tfhub.dev/deepmind/biggan-deep-128/1?tf-hub-format=compressed'
+            r = requests.get(url, allow_redirects=True)
+            open(file_name, 'wb').write(r.content)
+            file = tarfile.open(file_name)
+            file.extractall(tmp_path)
+            file.close()
+            os.remove(file_name)
+
         tf.reset_default_graph()
-        print('Loading BigGAN module from:', self.module_path)
-        self.module = hub.Module(self.module_path)
+        tf.compat.v1.disable_eager_execution()
+        print('Loading BigGAN module')
+        self.module = hub.Module('algorithms/models/MORPHING')
         self.inputs = {k: tf.placeholder(v.dtype, v.get_shape().as_list(), k)
                        for k, v in self.module.get_input_info_dict().items()}
         self.output = self.module(self.inputs)
