@@ -5,9 +5,43 @@ import os
 import moviepy.editor as mpe
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
-
+from tkinter.messagebox import showerror
 
 class Slideshow(tk.Frame):
+    def __init__(self, parent):
+        tk.Frame.__init__(self, parent, highlightbackground="blue", highlightthickness=1)
+        self.audio_file = ''
+        self.image_folder = ''
+        self.final = None
+        self.top_padding = 50
+
+        self.folder_button = tk.Button(self, text='Browse folder with images', font=44, command=self.browse_folder).place(
+                                        x=60, y=self.top_padding + 20, height=40, width=400)
+        self.folder_label = tk.Label(self, text='', font=44, background="lightgrey").place(
+                                        x=460, y=self.top_padding + 20, height=40, width=400)
+
+        self.audio_label = tk.Label(self, text='', font=44, background="lightgrey").place(
+                                        x=460, y=self.top_padding + 61, height=40, width=400)
+        self.audio_button = tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(
+                                        x=60, y=self.top_padding + 61, height=40, width=400)
+
+        self.submit_button = tk.Button(self, text='Create slideshow', font=44, command=self.create_slideshow).place(
+                                        x=60, y=self.top_padding + 102, height=40, width=400)
+
+        self.save_button = tk.Button(self, text='Save', font=44, command=self.save_slideshow).place(
+                                        x=460, y=self.top_padding + 102, height=40, width=400)
+
+    def save_slideshow(self):
+        if self.final is None:
+            tk.messagebox.showerror(title="Error", message="There is nothing to save. Create slideshow first.")
+            return
+
+        filename = filedialog.asksaveasfile(mode='wb', defaultextension=".mp4", filetypes=(("MP4", "*.mp4"),
+                                                                                           ("all files", "*.*")))
+        if not filename:
+            return
+        self.final.write_videofile(filename.name, fps=100)
+
     # Browse audio file
     def browse_audio(self):
         self.audio_file = filedialog.askopenfilename(initialdir="/",
@@ -16,15 +50,23 @@ class Slideshow(tk.Frame):
                                                             "*.wav"),
                                                            ("all files",
                                                             "*.*")))
-        tk.Label(self, text=self.audio_file).grid(row=1, column=0)
+        self.audio_label = tk.Label(self, text=os.path.basename(self.audio_file), font=44, background="lightgrey").place(
+                                        x=460, y=self.top_padding + 61, height=40, width=400)
 
     # Browse folder containing photos to generate video from
     def browse_folder(self):
         self.image_folder = filedialog.askdirectory(initialdir="/", title='Please select a directory')
-        tk.Label(self, text=self.image_folder).grid(row=3, column=0)
+        self.folder_label = tk.Label(self, text=os.path.basename(self.image_folder), font=44, background="lightgrey").place(
+                                        x=460, y=self.top_padding + 20, height=40, width=400)
 
     # Creation of slideshow from folder with photos and audio file
     def create_slideshow(self):
+        if self.audio_file == '':
+            tk.messagebox.showerror(title="Error", message="Select audio file first.")
+            return
+        elif self.image_folder == '':
+            tk.messagebox.showerror(title="Error", message="Select images folder first.")
+            return
         video_name = 'video.avi'
         afe = AudioFtExt(self.audio_file, hz_scale=22050)
         afe.getSpectrogramData()
@@ -36,6 +78,9 @@ class Slideshow(tk.Frame):
         height, width, layers = frame.shape
         video = cv2.VideoWriter(video_name, 0, 100, (width, height))
         beat_times = np.append(beat_times, afe.duration_time)
+        if beat_times.size >= len(images):
+            tk.messagebox.showerror(title="Error", message="There are not enough images in folder: " + self.image_folder)
+            return
         number_of_frames = int(afe.duration_time * 100)
         image_number = 0
         # creation of the video, applying images to the frames
@@ -62,18 +107,11 @@ class Slideshow(tk.Frame):
         video.release()
         audio = mpe.AudioFileClip(self.audio_file)
         video = mpe.VideoFileClip(video_name)
-        final = video.set_audio(audio)
-        final.write_videofile("output.mp4", fps=100)
+        self.final = video.set_audio(audio)
+        self.final.write_videofile("output.mp4", fps=100)
         os.startfile("output.mp4")
 
-    def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        self.audio_file = ''
-        self.image_folder = ''
-        tk.Button(self, text='Browse audio file', command=self.browse_audio).grid(row=0, column=0)
-        tk.Label(self, text='').grid(row=1, column=0)
-        tk.Button(self, text='Browse folder with images', command=self.browse_folder).grid(row=2, column=0)
-        tk.Label(self, text='').grid(row=3, column=0)
-        tk.Button(self, text='Create slideshow', command=self.create_slideshow).grid(row=4, column=0)
+
+
 
 
