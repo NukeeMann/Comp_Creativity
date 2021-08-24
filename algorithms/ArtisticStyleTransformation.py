@@ -197,10 +197,12 @@ class AST(tk.Frame):
         self.result.save(filename)
 
     @threaded
+    @tf.function
     def loadModel(self):
-        tf.compat.v1.enable_eager_execution()
         # Load the model
+        print("Loading ATS")
         self.hub_model = hub.load('algorithms/models/ATS')
+        print("ATS loaded")
 
     @staticmethod
     def load_img(path_to_img, max_dim=0):
