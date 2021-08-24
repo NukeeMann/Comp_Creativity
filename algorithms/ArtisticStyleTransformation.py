@@ -1,4 +1,5 @@
 import threading
+import tkinter
 import tkinter as tk
 from tkinter.messagebox import showerror
 import os
@@ -8,7 +9,8 @@ import tensorflow_hub as hub
 import numpy as np
 from threading import Thread
 from concurrent.futures import Future
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL import ImageTk as itk
 
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
@@ -43,18 +45,17 @@ class AST(tk.Frame):
         self.preview_image.place(x=140, y=20, height=360, width=640)
 
         self.label_select_styl = tk.Label(self, text='Select style: ', font=("TkDefaultFont", 16))
-        self.label_select_styl.place(x=10, y=390, height=30, width=120)
-        self.tmp_style_slider = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 40), fg='white',
-                                         background="grey")
-        self.tmp_style_slider.place(x=9, y=420, height=120, width=900)
+        self.label_select_styl.place(x=44, y=390, height=30, width=120)
+        self.style_slider = tk.Label(self, font=("TkDefaultFont", 40), fg='white', background="grey")
+        self.style_slider.place(x=42, y=420, height=115, width=835)
 
-        self.label_cont_img = tk.Label(self, text='', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_cont_img = tk.Label(self, text='', font=("TkDefaultFont", 8), background="lightgrey")
         self.label_cont_img.place(x=255, y=top_padding + 20, height=40, width=200)
         self.button_cont_img = tk.Button(self, text='Browse content image', font=("TkDefaultFont", 12),
                                          command=self.browse_image)
         self.button_cont_img.place(x=55, y=top_padding + 20, height=40, width=200)
 
-        self.label_style_img = tk.Label(self, text='', font=("TkDefaultFont", 12), background="lightgrey")
+        self.label_style_img = tk.Label(self, text='', font=("TkDefaultFont", 8), background="lightgrey")
         self.label_style_img.place(x=255, y=top_padding + 62, height=40, width=200)
         self.button_style_img = tk.Button(self, text='Browse style image', font=("TkDefaultFont", 12),
                                           command=self.browse_style)
@@ -75,7 +76,50 @@ class AST(tk.Frame):
 
         self.button_save = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_image)
         self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
+        start = 33
+        self.style_img_1 = itk.PhotoImage(file="images/slider/min_the_shipwreck_of_the_minotaur.jpg")
+        self.style_img_1b = tk.Button(self, text="test", image=self.style_img_1,
+                                      command=lambda img='images/slider/the_shipwreck_of_the_minotaur.jpg':
+                                      self.select_style(img, "The Shipwreck Of The Minotaur"))
+        self.style_img_1b.place(x=start+14, y=425)
 
+        self.style_img_2 = itk.PhotoImage(file="images/slider/min_starry_night.jpg")
+        self.style_img_2b = tk.Button(self, text="test", image=self.style_img_2,
+                                      command=lambda img='images/slider/starry_night.jpg':
+                                      self.select_style(img, "Starry Night"))
+        self.style_img_2b.place(x=start+161, y=425)
+
+        self.style_img_3 = itk.PhotoImage(file="images/slider/min_der_schrei.jpg")
+        self.style_img_3b = tk.Button(self, text="test", image=self.style_img_3,
+                                      command=lambda img='images/slider/der_schrei.jpg':
+                                      self.select_style(img, "Der Schrei"))
+        self.style_img_3b.place(x=start+292, y=425)
+
+        self.style_img_4 = itk.PhotoImage(file="images/slider/min_femme_nue_assise.jpg")
+        self.style_img_4b = tk.Button(self, text="test", image=self.style_img_4,
+                                      command=lambda img='images/slider/femme_nue_assise.jpg':
+                                      self.select_style(img, "Femme Nue Assise"))
+        self.style_img_4b.place(x=start+372, y=425)
+
+        self.style_img_5 = itk.PhotoImage(file="images/slider/min_composition.jpg")
+        self.style_img_5b = tk.Button(self, text="test", image=self.style_img_5,
+                                      command=lambda img='images/slider/composition.jpg':
+                                      self.select_style(img, "Composition"))
+        self.style_img_5b.place(x=start+453, y=425)
+
+        self.style_img_6 = itk.PhotoImage(file="images/slider/min_persistence_of_memory.jpg")
+        self.style_img_6b = tk.Button(self, text="test", image=self.style_img_6,
+                                      command=lambda img='images/slider/persistence_of_memory.jpg':
+                                      self.select_style(img, "Persistence Of Memory"))
+        self.style_img_6b.place(x=start+605, y=425)
+
+        self.style_img_7 = itk.PhotoImage(file="images/slider/min_autoportret.jpg")
+        self.style_img_7b = tk.Button(self, text="test", image=self.style_img_7,
+                                      command=lambda img='images/slider/autoportret.jpg':
+                                      self.select_style(img, "Autoportret"))
+        self.style_img_7b.place(x=start+753, y=425)
+
+        self.select_style("")
         # Load the model
         tf.compat.v1.enable_eager_execution()
         self.load_model_h = self.loadModel()
@@ -106,6 +150,11 @@ class AST(tk.Frame):
             self.style_file = selected_style
             self.label_style_img.config(text=os.path.basename(self.style_file))
 
+    # Set chosen style image
+    def select_style(self, selected_style, name=""):
+        self.style_file = selected_style
+        self.label_style_img.config(text=os.path.basename(name))
+
     # Transform image
     def transform(self):
         if self.image_file == '':
@@ -129,7 +178,7 @@ class AST(tk.Frame):
 
         # Show transformed image
         output_img = self.resizeImg(output_img)
-        output_img = ImageTk.PhotoImage(output_img)
+        output_img = itk.PhotoImage(output_img)
         self.preview_image.config(image=output_img)
         self.preview_image.image = output_img
         self.preview_image.place(x=(920 - output_img.width()) / 2, y=20, height=output_img.height(),
