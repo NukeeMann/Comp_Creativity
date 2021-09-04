@@ -13,6 +13,7 @@ from concurrent.futures import Future
 import algorithms.MorphingLabels as MorphingLabels
 import tarfile, os, requests
 from os import path
+from PIL import ImageTk
 
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
@@ -48,14 +49,14 @@ class Morphing(tk.Frame):
         self.image_number_1 = tk.StringVar(self)
         self.image_number_1.set(self.choices[0])
 
-        self.choose_box_param1 = tk.OptionMenu(self, self.image_number_1, *self.choices)
+        self.choose_box_param1 = tk.OptionMenu(self, self.image_number_1, *self.choices, command=self.option_changed)
         self.choose_box_param1.config(font=("TkDefaultFont", 12))
         dropdown1 = self.nametowidget(self.choose_box_param1.menuname).config(font=("TkDefaultFont", 12))
         self.choose_box_param1.place(x=460, y=top_padding + 20, height=40, width=400)
 
         self.image_number_2 = tk.StringVar(self)
         self.image_number_2.set(self.choices[0])
-        self.choose_box_param2 = tk.OptionMenu(self, self.image_number_2, *self.choices)
+        self.choose_box_param2 = tk.OptionMenu(self, self.image_number_2, *self.choices, command=self.option_changed)
         self.choose_box_param2.config(font=("TkDefaultFont", 12))
         dropdown2 = self.nametowidget(self.choose_box_param2.menuname).config(font=("TkDefaultFont", 12))
         self.choose_box_param2.place(x=460, y=top_padding + 61, height=40, width=400)
@@ -67,8 +68,27 @@ class Morphing(tk.Frame):
                                         x=60, y=top_padding + 102, height=40, width=400)
         self.save_button = tk.Button(self, text='Save!', font=44, command=self.save_morphing).place(
                                         x=460, y=top_padding + 102, height=40, width=400)
+        self.label1 = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 16)).place(x=410, y=220, height=40, width=100)
+        self.preview_image1 = tk.Label(self, background="black")
+        self.preview_image1.place(x=137, y=280, height=256, width=256)
+        self.preview_image2 = tk.Label(self, background="black")
+        self.preview_image2.place(x=537, y=280, height=256, width=256)
+
+        self.option_changed()
         # Load the model
         self.load_model_h = self.loadModel()
+
+    def option_changed(self, *args):
+        image1_path = os.path.join("algorithms", "models", "morphing_imgs", MorphingLabels.get_img(self.image_number_1.get()))
+        image2_path = os.path.join("algorithms", "models", "morphing_imgs", MorphingLabels.get_img(self.image_number_2.get()))
+        img1 = ImageTk.PhotoImage(file=image1_path)
+        img2 = ImageTk.PhotoImage(file=image2_path)
+        self.preview_image1.config(image=img1)
+        self.preview_image1.image = img1
+        self.preview_image1.place(x=137, y=280, height=256, width=256)
+        self.preview_image2.config(image=img2)
+        self.preview_image2.image = img2
+        self.preview_image2.place(x=537, y=280, height=256, width=256)
 
     @threaded
     def loadModel(self):

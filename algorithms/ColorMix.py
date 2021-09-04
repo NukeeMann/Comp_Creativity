@@ -21,10 +21,10 @@ class ColorMix(tk.Frame):
             x=60, y=self.top_padding, height=40, width=400)
         self.label0 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding, height=40, width=400)
         tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(
-            x=60, y=self.top_padding + 40, height=40, width=400)
-        self.label1 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding + 40, height=40, width=400)
+            x=60, y=self.top_padding + 41, height=40, width=400)
+        self.label1 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding + 41, height=40, width=400)
 
-        tk.Button(self, text='Choose basic color', font=44, command=self.choose_color).place(x=60, y=self.top_padding+81, height=60, width=300)
+        tk.Button(self, text='Choose basic color', font=44, command=self.choose_color).place(x=60, y=self.top_padding+82, height=60, width=300)
 
         # x1, x2, x3 are components of RGB color which is basis of video, each 1/3 part of frame will be generated from
         # # this color with mixed one of those components
@@ -35,17 +35,17 @@ class ColorMix(tk.Frame):
         # self.x3 = tk.Entry(self, font=44, justify='center')
         # self.x3.place(x=360, y=self.top_padding + 101, height=20, width=100)
         self.preview_image = tk.Label(self, background="black")
-        self.preview_image.place(x=360, y=self.top_padding + 81, height=60, width=100)
+        self.preview_image.place(x=360, y=self.top_padding + 82, height=60, width=100)
 
         self.label_frequency_ranges = tk.Label(self, text='Frequency ranges (Hz): ', font=("TkDefaultFont", 16))
-        self.label_frequency_ranges.place(x=460, y=self.top_padding+81, height=60, width=300)
+        self.label_frequency_ranges.place(x=460, y=self.top_padding+82, height=60, width=300)
         self.freq_range_1 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_1.place(x=760, y=self.top_padding + 81, height=30, width=100)
+        self.freq_range_1.place(x=760, y=self.top_padding + 82, height=30, width=100)
         self.freq_range_2 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_2.place(x=760, y=self.top_padding + 111, height=30, width=100)
+        self.freq_range_2.place(x=760, y=self.top_padding + 112, height=30, width=100)
 
-        tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 142, height=40, width=400)
-        tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 142, height=40, width=400)
+        tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 143, height=40, width=400)
+        tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 143, height=40, width=400)
 
     def browse_image(self):
         self.image_file = filedialog.askopenfilename(initialdir="/",
@@ -60,7 +60,7 @@ class ColorMix(tk.Frame):
         color = colorchooser.askcolor(title="Choose color")
         self.color_code = color[0]
         self.preview_image = tk.Label(self, background=color[1])
-        self.preview_image.place(x=360, y=self.top_padding + 81, height=60, width=100)
+        self.preview_image.place(x=360, y=self.top_padding + 82, height=60, width=100)
 
     def save_color_mix(self):
         if self.final is None:
@@ -81,7 +81,7 @@ class ColorMix(tk.Frame):
                                                             "*.wav"),
                                                            ("all files",
                                                             "*.*")))
-        self.label1 = tk.Label(self, text=os.path.basename(self.audio_file), font=44, background="lightgrey").place(x=460, y=self.top_padding + 40, height=40, width=400)
+        self.label1 = tk.Label(self, text=os.path.basename(self.audio_file), font=44, background="lightgrey").place(x=460, y=self.top_padding + 42, height=40, width=400)
 
     # Generate video from audio file
     def generate(self):
