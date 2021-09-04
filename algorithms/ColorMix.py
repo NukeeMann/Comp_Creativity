@@ -6,38 +6,61 @@ import moviepy.editor as mpe
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
 from tkinter.messagebox import showerror
-
+from tkinter import colorchooser
+from tkinter import Canvas
 
 class ColorMix(tk.Frame):
     def __init__(self, parent):
         tk.Frame.__init__(self, parent)
+        self.final = None
+        self.color_code = (0, 0, 0)
         self.audio_file = ''
-        self.top_padding = 50
+        self.image_file = ''
+        self.top_padding = 70
+        tk.Button(self, text='Browse image file', font=44, command=self.browse_image).place(
+            x=60, y=self.top_padding, height=40, width=400)
+        self.label0 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding, height=40, width=400)
         tk.Button(self, text='Browse audio file', font=44, command=self.browse_audio).place(
-            x=60, y=self.top_padding + 20, height=40, width=400)
-        self.label1 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding + 20, height=40, width=400)
+            x=60, y=self.top_padding + 40, height=40, width=400)
+        self.label1 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding + 40, height=40, width=400)
 
-        self.label_select_color = tk.Label(self, text='Choose basic color (RGB): ', font=("TkDefaultFont", 16))
-        self.label_select_color.place(x=60, y=self.top_padding+61, height=60, width=300)
+        tk.Button(self, text='Choose basic color', font=44, command=self.choose_color).place(x=60, y=self.top_padding+81, height=60, width=300)
 
         # x1, x2, x3 are components of RGB color which is basis of video, each 1/3 part of frame will be generated from
-        # this color with mixed one of those components
-        self.x1 = tk.Entry(self, font=44, justify='center')
-        self.x1.place(x=360, y=self.top_padding + 61, height=20, width=100)
-        self.x2 = tk.Entry(self, font=44, justify='center')
-        self.x2.place(x=360, y=self.top_padding + 81, height=20, width=100)
-        self.x3 = tk.Entry(self, font=44, justify='center')
-        self.x3.place(x=360, y=self.top_padding + 101, height=20, width=100)
+        # # this color with mixed one of those components
+        # self.x1 = tk.Entry(self, font=44, justify='center')
+        # self.x1.place(x=360, y=self.top_padding + 61, height=20, width=100)
+        # self.x2 = tk.Entry(self, font=44, justify='center')
+        # self.x2.place(x=360, y=self.top_padding + 81, height=20, width=100)
+        # self.x3 = tk.Entry(self, font=44, justify='center')
+        # self.x3.place(x=360, y=self.top_padding + 101, height=20, width=100)
+        self.preview_image = tk.Label(self, background="black")
+        self.preview_image.place(x=360, y=self.top_padding + 81, height=60, width=100)
 
         self.label_frequency_ranges = tk.Label(self, text='Frequency ranges (Hz): ', font=("TkDefaultFont", 16))
-        self.label_frequency_ranges.place(x=460, y=self.top_padding+61, height=60, width=300)
+        self.label_frequency_ranges.place(x=460, y=self.top_padding+81, height=60, width=300)
         self.freq_range_1 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_1.place(x=760, y=self.top_padding + 61, height=30, width=100)
+        self.freq_range_1.place(x=760, y=self.top_padding + 81, height=30, width=100)
         self.freq_range_2 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_2.place(x=760, y=self.top_padding + 91, height=30, width=100)
+        self.freq_range_2.place(x=760, y=self.top_padding + 111, height=30, width=100)
 
-        tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 122, height=40, width=400)
-        tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 122, height=40, width=400)
+        tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 142, height=40, width=400)
+        tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 142, height=40, width=400)
+
+    def browse_image(self):
+        self.image_file = filedialog.askopenfilename(initialdir="/",
+                                                      title="Select a File",
+                                                      filetypes=(("jpeg files", "*.jpg"),
+                                                                 ("gif files", "*.gif*"),
+                                                                 ("png files", "*.png"),
+                                                                 ("all files", "*.*")))
+        self.label0 = tk.Label(self, text=os.path.basename(self.image_file), font=44, background="lightgrey").place(x=460, y=self.top_padding, height=40, width=400)
+
+    def choose_color(self):
+        color = colorchooser.askcolor(title="Choose color")
+        self.color_code = color[0]
+        self.preview_image = tk.Label(self, background=color[1])
+        self.preview_image.place(x=360, y=self.top_padding + 81, height=60, width=100)
 
     def save_color_mix(self):
         if self.final is None:
@@ -58,7 +81,7 @@ class ColorMix(tk.Frame):
                                                             "*.wav"),
                                                            ("all files",
                                                             "*.*")))
-        self.label1 = tk.Label(self, text=os.path.basename(self.audio_file), font=44, background="lightgrey").place(x=460, y=self.top_padding + 20, height=40, width=400)
+        self.label1 = tk.Label(self, text=os.path.basename(self.audio_file), font=44, background="lightgrey").place(x=460, y=self.top_padding + 40, height=40, width=400)
 
     # Generate video from audio file
     def generate(self):
@@ -66,12 +89,10 @@ class ColorMix(tk.Frame):
         if self.audio_file == '':
             tk.messagebox.showerror(title="Error", message="Select audio file first.")
             return
-        if self.x1.get() == '' or self.x2.get() == '' or self.x3.get() == '':
-            tk.messagebox.showerror(title="Error", message="Select RGB color first.")
+        if self.image_file == '':
+            tk.messagebox.showerror(title="Error", message="Select image file first.")
             return
-        if int(self.x1.get()) > 255 or int(self.x2.get()) > 255 or int(self.x3.get()) > 255 or int(self.x1.get()) < 0 or int(self.x2.get()) < 0 or int(self.x3.get()) < 0:
-            tk.messagebox.showerror(title="Error", message="RGB parameters must be in range (0,255).")
-            return
+        image = cv2.imread(self.image_file)
         video_name = 'video.avi'
         afe = AudioFtExt(self.audio_file, hz_scale=hz_scale)
         afe.getSpectrogramData()
@@ -87,7 +108,7 @@ class ColorMix(tk.Frame):
         max_db = max(freq)
         min_db = min(freq)
         delta_db = [(max_db[0] - min_db[0]), (max_db[1] - min_db[1]), (max_db[2] - min_db[2])]
-        width, height = 384, 384
+        height, width, layers = image.shape
         video = cv2.VideoWriter(video_name, 0, 100, (width, height))
         number_of_frames = int(afe.duration_time * 100)
         # creation of the video, applying colors to the frames
@@ -97,11 +118,12 @@ class ColorMix(tk.Frame):
             rgb = freq[current_index]
             rgb = [((rgb[0] - min_db[0]) / delta_db[0]) * 255, ((rgb[1] - min_db[1]) / delta_db[1]) * 255,
                    ((rgb[2] - min_db[2]) / delta_db[2]) * 255]
-            rgbImage = np.zeros((width, height, 3), np.uint8)
-            rgbImage[0:height // 3:] = (int(self.x1.get()), int(self.x2.get()), int(rgb[2]))
-            rgbImage[height // 3:2 * height // 3:] = (int(self.x1.get()), int(rgb[1]), int(self.x3.get()))
-            rgbImage[2 * height // 3::] = (int(rgb[0]), int(self.x2.get()), int(self.x3.get()))
-            video.write(rgbImage)
+            rgbImage = np.zeros((height, width, 3), np.uint8)
+            rgbImage[0:height // 3:] = (int(self.color_code[0]), int(self.color_code[1]), int(rgb[2]))
+            rgbImage[height // 3:2 * height // 3:] = (int(self.color_code[0]), int(rgb[1]), int(self.color_code[2]))
+            rgbImage[2 * height // 3::] = (int(rgb[0]), int(self.color_code[1]), int(self.color_code[2]))
+            output = cv2.addWeighted(rgbImage, 0.5, image, 0.5, 0)
+            video.write(output)
         # mixing music with the picture and creating final video
         cv2.destroyAllWindows()
         video.release()
