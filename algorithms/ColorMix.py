@@ -37,13 +37,16 @@ class ColorMix(tk.Frame):
         self.preview_image = tk.Label(self, background="black")
         self.preview_image.place(x=360, y=self.top_padding + 82, height=60, width=100)
 
-        self.label_frequency_ranges = tk.Label(self, text='Frequency ranges (Hz): ', font=("TkDefaultFont", 16))
-        self.label_frequency_ranges.place(x=460, y=self.top_padding+82, height=60, width=300)
-        self.freq_range_1 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_1.place(x=760, y=self.top_padding + 82, height=30, width=100)
-        self.freq_range_2 = tk.Entry(self, font=44, justify='center')
-        self.freq_range_2.place(x=760, y=self.top_padding + 112, height=30, width=100)
-
+        self.label_frequency_ranges = tk.Label(self, text='Frequency ranges\nboundaries (Hz): ', font=("TkDefaultFont", 16))
+        self.label_frequency_ranges.place(x=460, y=self.top_padding+82, height=60, width=220)
+        # self.freq_range_1 = tk.Entry(self, font=44, justify='center')
+        # self.freq_range_1.place(x=760, y=self.top_padding + 82, height=30, width=100)
+        # self.freq_range_2 = tk.Entry(self, font=44, justify='center')
+        # self.freq_range_2.place(x=760, y=self.top_padding + 112, height=30, width=100)
+        self.slider = tk.Scale(self, from_=0, to=10000, orient=tk.HORIZONTAL)
+        self.slider.place(x=660, y=self.top_padding+82, height=30, width=150)
+        self.slider2 = tk.Scale(self, from_=10000, to=20000, orient=tk.HORIZONTAL)
+        self.slider2.place(x=660, y=self.top_padding+112, height=30, width=150)
         tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 143, height=40, width=400)
         tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 143, height=40, width=400)
 
@@ -100,8 +103,10 @@ class ColorMix(tk.Frame):
         # creation of spectrogram data and modifying it to fit our requirements
         spec_data = afe.spec_data.T
         freq = []
-        freq_range_1 = int(len(spec_data[0])*int(self.freq_range_1.get())/hz_scale)
-        freq_range_2 = int(len(spec_data[0])*int(self.freq_range_2.get())/hz_scale)
+        print("sl1:" + str(self.slider.get()))
+        print("sl2:" + str(self.slider2.get()))
+        freq_range_1 = int(len(spec_data[0])*int(self.slider.get())/hz_scale)
+        freq_range_2 = int(len(spec_data[0])*int(self.slider2.get())/hz_scale)
         for i in range(len(spec_data)):
             freq.append([np.mean(spec_data[i][0:freq_range_1]), np.mean(spec_data[i][freq_range_1:freq_range_2]),
                          np.mean(spec_data[i][freq_range_2])])
