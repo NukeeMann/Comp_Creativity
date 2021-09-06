@@ -103,6 +103,7 @@ class MainApplication(tk.Tk):
 
 
 if __name__ == "__main__":
+    tf.compat.v1.enable_eager_execution()
     app = MainApplication()
     # Add frames so that u can call them later
     implemented_alg = {
