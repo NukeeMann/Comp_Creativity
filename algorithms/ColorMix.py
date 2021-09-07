@@ -17,6 +17,8 @@ class ColorMix(tk.Frame):
         self.audio_file = ''
         self.image_file = ''
         self.top_padding = 70
+        self.img_path = os.path.dirname(os.path.abspath(__file__))
+        self.audio_path = os.path.dirname(os.path.abspath(__file__))
         tk.Button(self, text='Browse image file', font=44, command=self.browse_image).place(
             x=60, y=self.top_padding, height=40, width=400)
         self.label0 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding, height=40, width=400)
@@ -48,10 +50,11 @@ class ColorMix(tk.Frame):
         self.slider2 = tk.Scale(self, from_=10000, to=20000, orient=tk.HORIZONTAL)
         self.slider2.place(x=660, y=self.top_padding+112, height=30, width=150)
         tk.Button(self, text='Color Mix', font=44, command=self.generate).place(x=60, y=self.top_padding + 143, height=40, width=400)
-        tk.Button(self, text='Save', font=44, command=self.save_color_mix).place(x=460, y=self.top_padding + 143, height=40, width=400)
+        tk.Button(self, text='Save result', font=44, bg='green', command=self.save_color_mix).place(
+                            x=460, y=self.top_padding + 143, height=40, width=400)
 
     def browse_image(self):
-        self.image_file = filedialog.askopenfilename(initialdir="/",
+        self.image_file = filedialog.askopenfilename(initialdir=self.img_path,
                                                       title="Select a File",
                                                       filetypes=(("jpeg files", "*.jpg"),
                                                                  ("gif files", "*.gif*"),
@@ -70,15 +73,15 @@ class ColorMix(tk.Frame):
             tk.messagebox.showerror(title="Error", message="There is nothing to save. Create morphing first.")
             return
 
-        filename = filedialog.asksaveasfile(mode='wb', defaultextension=".mp4", filetypes=(("MP4", "*.mp4"),
-                                                                                           ("all files", "*.*")))
+        filename = filedialog.asksaveasfile(initialdir="results", mode='wb', defaultextension=".mp4",
+                                            filetypes=(("MP4", "*.mp4"), ("all files", "*.*")))
         if not filename:
             return
         self.final.write_videofile(filename.name, fps=100)
 
     # Browse audio file
     def browse_audio(self):
-        self.audio_file = filedialog.askopenfilename(initialdir="/",
+        self.audio_file = filedialog.askopenfilename(initialdir=self.audio_path,
                                                 title="Select a File",
                                                 filetypes=(("wav files",
                                                             "*.wav"),

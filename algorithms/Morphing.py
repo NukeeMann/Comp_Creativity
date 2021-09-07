@@ -11,8 +11,8 @@ from tkinter.messagebox import showerror
 from threading import Thread
 from concurrent.futures import Future
 import algorithms.MorphingLabels as MorphingLabels
-import tarfile, os, requests
-from os import path
+import tarfile, requests
+import os
 from PIL import ImageTk
 
 # Load compressed models from tensorflow_hub
@@ -61,12 +61,13 @@ class Morphing(tk.Frame):
         dropdown2 = self.nametowidget(self.choose_box_param2.menuname).config(font=("TkDefaultFont", 12))
         self.choose_box_param2.place(x=460, y=top_padding + 61, height=40, width=400)
 
-        self.label1 = tk.Label(self, text='Choose first image:', font=44, background="lightgrey").place(x=60, y=top_padding + 20, height=40, width=400)
+        self.label1 = tk.Label(self, text='Choose first image:', font=44, background="lightgrey").place(
+                                        x=60, y=top_padding + 20, height=40, width=400)
         self.label2 = tk.Label(self, text='Choose second image:', font=44, background="lightgrey").place(
-            x=60, y=top_padding + 61, height=40, width=400)
-        self.generate_button = tk.Button(self, text='Generate!', font=44, command=self.create_morphing).place(
+                                        x=60, y=top_padding + 61, height=40, width=400)
+        self.generate_button = tk.Button(self, text='Generate morphing', font=44, command=self.create_morphing).place(
                                         x=60, y=top_padding + 102, height=40, width=400)
-        self.save_button = tk.Button(self, text='Save!', font=44, command=self.save_morphing).place(
+        self.save_button = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_morphing).place(
                                         x=460, y=top_padding + 102, height=40, width=400)
         self.label1 = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 16)).place(x=410, y=220, height=40, width=100)
         self.preview_image1 = tk.Label(self, background="black")
@@ -94,12 +95,15 @@ class Morphing(tk.Frame):
     def loadModel(self):
         tmp_path = os.path.join("algorithms", "models", "MORPHING")
         file_name = os.path.join("algorithms", "models", "MORPHING", "tmp.tar.gz")
-        if not path.exists(tmp_path):
-            os.mkdir(tmp_path)
+        if not os.path.exists(tmp_path) or len(os.listdir(tmp_path)) == 0:
+            if not os.path.exists(tmp_path):
+                os.mkdir(tmp_path)
             url = 'https://tfhub.dev/deepmind/biggan-deep-128/1?tf-hub-format=compressed'
+            print("Downloading BigGAN module")
             r = requests.get(url, allow_redirects=True)
             open(file_name, 'wb').write(r.content)
             file = tarfile.open(file_name)
+            print("Extracting BigGAN module")
             file.extractall(tmp_path)
             file.close()
             os.remove(file_name)
@@ -126,8 +130,8 @@ class Morphing(tk.Frame):
             tk.messagebox.showerror(title="Error", message="There is nothing to save. Create morphing first.")
             return
 
-        filename = filedialog.asksaveasfile(mode='wb', defaultextension=".mp4", filetypes=(("MP4", "*.mp4"),
-                                                                                           ("all files", "*.*")))
+        filename = filedialog.asksaveasfile(initialdir="results", mode='wb', defaultextension=".mp4",
+                                            filetypes=(("MP4", "*.mp4"), ("all files", "*.*")))
         if not filename:
             return
         self.video.write_videofile(filename.name, fps=100)
@@ -210,5 +214,4 @@ class Morphing(tk.Frame):
         cv2.destroyAllWindows()
         self.video.release()
         self.video = mpe.VideoFileClip(video_name)
-        self.video.write_videofile("output.mp4", fps=50)
-        os.startfile("output.mp4")
+        os.startfile("video.avi")
