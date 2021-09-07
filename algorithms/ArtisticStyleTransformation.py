@@ -1,3 +1,4 @@
+import tarfile
 import threading
 import tkinter
 import tkinter as tk
@@ -11,6 +12,7 @@ from threading import Thread
 from concurrent.futures import Future
 from PIL import Image
 from PIL import ImageTk as itk
+import requests
 
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
@@ -39,6 +41,8 @@ class AST(tk.Frame):
         self.style_file = ''
         self.result = None
         self.hub_model = None
+        self.open_file_path = os.path.dirname(os.path.abspath(__file__))
+        self.open_style_path = os.path.dirname(os.path.abspath(__file__))
         top_padding = 530
 
         self.preview_image = tk.Label(self, text='PREVIEW', font=("TkDefaultFont", 80), fg='white', background="black")
@@ -126,7 +130,7 @@ class AST(tk.Frame):
 
     # Browse image to transform
     def browse_image(self):
-        selected_content = filedialog.askopenfilename(initialdir="/",
+        selected_content = filedialog.askopenfilename(initialdir=self.open_file_path,
                                                       title="Select a File",
                                                       filetypes=(("jpeg files", "*.jpg"),
                                                                  ("gif files", "*.gif*"),
@@ -134,12 +138,13 @@ class AST(tk.Frame):
                                                                  ("all files", "*.*")))
 
         if selected_content:
+            self.open_file_path = os.path.dirname(selected_content)
             self.image_file = selected_content
             self.label_cont_img.config(text=os.path.basename(self.image_file))
 
     # Browse image to get style from
     def browse_style(self):
-        selected_style = filedialog.askopenfilename(initialdir="/",
+        selected_style = filedialog.askopenfilename(initialdir=self.open_style_path,
                                                     title="Select a File",
                                                     filetypes=(("jpeg files", "*.jpg"),
                                                                ("gif files", "*.gif*"),
@@ -147,6 +152,7 @@ class AST(tk.Frame):
                                                                ("all files", "*.*")))
 
         if selected_style:
+            self.open_style_path = os.path.dirname(selected_style)
             self.style_file = selected_style
             self.label_style_img.config(text=os.path.basename(self.style_file))
 
@@ -189,9 +195,9 @@ class AST(tk.Frame):
             tk.messagebox.showerror(title="Error", message="There is nothing to save. Transfer an image first.")
             return
 
-        filename = filedialog.asksaveasfile(mode='wb', defaultextension=".jpg", filetypes=(("JPEG", "*.jpg"),
-                                                                                           ("PNG", "*.png"),
-                                                                                           ("all files", "*.*")))
+        filename = filedialog.asksaveasfile(initialdir="results", mode='wb', defaultextension=".jpg",
+                                            filetypes=(("JPEG", "*.jpg"), ("PNG", "*.png"), ("all files", "*.*")))
+
         if not filename:
             return
         self.result.save(filename)
@@ -199,6 +205,23 @@ class AST(tk.Frame):
     @threaded
     @tf.function
     def loadModel(self):
+        # Download the model
+        model_path = os.path.join("algorithms", "models", "ATS")
+        model_file = os.path.join("algorithms", "models", "ATS", "magenta_arbitrary-image-stylization-v1-256_2.tar.gz")
+        if not os.path.exists(model_path) or len(os.listdir(model_path)) == 0:
+            print("Downloading ATS module")
+            if not os.path.exists(model_path):
+                os.mkdir(model_path)
+            url = 'https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2?tf-hub-format=compressed'
+            r = requests.get(url, allow_redirects=True)
+            print("ATS downloaded")
+            open(model_file, 'wb').write(r.content)
+            file = tarfile.open(model_file)
+            print("Extracting ATS module")
+            file.extractall(model_path)
+            file.close()
+            os.remove(model_file)
+
         # Load the model
         print("Loading ATS")
         self.hub_model = hub.load('algorithms/models/ATS')
