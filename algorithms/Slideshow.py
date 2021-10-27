@@ -7,6 +7,7 @@ from moviepy.audio.io.AudioFileClip import AudioFileClip
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
 from tkinter.messagebox import showerror
+import random
 
 
 class Slideshow(tk.Frame):
@@ -35,6 +36,11 @@ class Slideshow(tk.Frame):
 
         self.save_button = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_slideshow).place(
             x=460, y=self.top_padding + 102, height=40, width=400)
+
+        self.checkboxValue = tk.IntVar()
+        self.checkbox = tk.Checkbutton(self, text="Shuffle images", font=44, variable=self.checkboxValue)
+        self.checkbox.place(
+            x=60, y=self.top_padding + 142, height=40, width=400)
 
     def save_slideshow(self):
         if self.final is None:
@@ -83,16 +89,20 @@ class Slideshow(tk.Frame):
         # Loading images from folder
         images = [img for img in os.listdir(self.image_folder) if
                   img.endswith(".jpeg") or img.endswith(".jpg") or img.endswith(".JPEG") or img.endswith(".JPG")]
+        if len(images) == 0:
+            tk.messagebox.showerror(title="Error",
+                                    message="There are no images in folder: " + self.image_folder)
+            return
         frame = cv2.imread(os.path.join(self.image_folder, images[0]))
         height, width, layers = frame.shape
         video = cv2.VideoWriter(video_name, 0, 100, (width, height))
         beat_times = np.append(beat_times, afe.duration_time)
-        if beat_times.size >= len(images):
-            tk.messagebox.showerror(title="Error",
-                                    message="There are not enough images in folder: " + self.image_folder)
-            return
+        while(beat_times.size >= len(images)):
+            images = images + images
         number_of_frames = int(afe.duration_time * 100)
         image_number = 0
+        if self.checkboxValue.get() == 1:
+            random.shuffle(images)
         # creation of the video, applying images to the frames
         for i in range(0, number_of_frames):
             # if actual index (actual time) is grater that value corresponding to specific photo, we need to increment image index

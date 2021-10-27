@@ -4,6 +4,7 @@ from algorithms.ArtisticStyleTransformation import *
 from algorithms.Slideshow import *
 from algorithms.ColorMix import *
 from algorithms.Morphing import *
+from algorithms.Morphing2 import *
 
 
 class ButtonsFrame(tk.Frame):
@@ -111,7 +112,8 @@ if __name__ == "__main__":
         "Artistic Style Transfer": AST(app),
         "Slideshow": Slideshow(app),
         "Color Mix": ColorMix(app),
-        "Morphing": Morphing(app)
+        "Morphing": Morphing(app),
+        "Morphing2": Morphing2(app)
     }
     # Create frames to show
     app.create(implemented_alg)
