@@ -4,6 +4,8 @@ import tkinter
 import tkinter as tk
 from tkinter.messagebox import showerror
 import os
+
+import PIL
 import tensorflow as tf
 from tkinter import filedialog
 import tensorflow_hub as hub
@@ -81,43 +83,45 @@ class AST(tk.Frame):
         self.button_save = tk.Button(self, text='Save result', font=44, bg='green', command=self.save_image)
         self.button_save.place(x=465, y=top_padding + 80, height=60, width=400)
         start = 33
-        self.style_img_1 = itk.PhotoImage(file="images/slider/min_the_shipwreck_of_the_minotaur.jpg")
+        #self.style_img_1 = itk.PhotoImage(file="images/slider/min_the_shipwreck_of_the_minotaur.jpg")
+        self.style_img_1 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_the_shipwreck_of_the_minotaur.jpg"))
+
         self.style_img_1b = tk.Button(self, text="test", image=self.style_img_1,
                                       command=lambda img='images/slider/the_shipwreck_of_the_minotaur.jpg':
                                       self.select_style(img, "The Shipwreck Of The Minotaur"))
         self.style_img_1b.place(x=start+14, y=425)
 
-        self.style_img_2 = itk.PhotoImage(file="images/slider/min_starry_night.jpg")
+        self.style_img_2 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_starry_night.jpg"))
         self.style_img_2b = tk.Button(self, text="test", image=self.style_img_2,
                                       command=lambda img='images/slider/starry_night.jpg':
                                       self.select_style(img, "Starry Night"))
         self.style_img_2b.place(x=start+161, y=425)
 
-        self.style_img_3 = itk.PhotoImage(file="images/slider/min_der_schrei.jpg")
+        self.style_img_3 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_der_schrei.jpg"))
         self.style_img_3b = tk.Button(self, text="test", image=self.style_img_3,
                                       command=lambda img='images/slider/der_schrei.jpg':
                                       self.select_style(img, "Der Schrei"))
         self.style_img_3b.place(x=start+292, y=425)
 
-        self.style_img_4 = itk.PhotoImage(file="images/slider/min_femme_nue_assise.jpg")
+        self.style_img_4 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_femme_nue_assise.jpg"))
         self.style_img_4b = tk.Button(self, text="test", image=self.style_img_4,
                                       command=lambda img='images/slider/femme_nue_assise.jpg':
                                       self.select_style(img, "Femme Nue Assise"))
         self.style_img_4b.place(x=start+372, y=425)
 
-        self.style_img_5 = itk.PhotoImage(file="images/slider/min_composition.jpg")
+        self.style_img_5 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_composition.jpg"))
         self.style_img_5b = tk.Button(self, text="test", image=self.style_img_5,
                                       command=lambda img='images/slider/composition.jpg':
                                       self.select_style(img, "Composition"))
         self.style_img_5b.place(x=start+453, y=425)
 
-        self.style_img_6 = itk.PhotoImage(file="images/slider/min_persistence_of_memory.jpg")
+        self.style_img_6 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_persistence_of_memory.jpg"))
         self.style_img_6b = tk.Button(self, text="test", image=self.style_img_6,
                                       command=lambda img='images/slider/persistence_of_memory.jpg':
                                       self.select_style(img, "Persistence Of Memory"))
         self.style_img_6b.place(x=start+605, y=425)
 
-        self.style_img_7 = itk.PhotoImage(file="images/slider/min_autoportret.jpg")
+        self.style_img_7 = itk.PhotoImage(image=PIL.Image.open("images/slider/min_autoportret.jpg"))
         self.style_img_7b = tk.Button(self, text="test", image=self.style_img_7,
                                       command=lambda img='images/slider/autoportret.jpg':
                                       self.select_style(img, "Autoportret"))

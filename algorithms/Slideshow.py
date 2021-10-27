@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import filedialog
 import cv2
 import os
-import moviepy.editor as mpe
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 import numpy as np
 from algorithms.audioFeatureExtractor import AudioFtExt
 from tkinter.messagebox import showerror
@@ -116,8 +117,8 @@ class Slideshow(tk.Frame):
         # Mixing music with the picture and creating final video
         cv2.destroyAllWindows()
         video.release()
-        audio = mpe.AudioFileClip(self.audio_file)
-        video = mpe.VideoFileClip(video_name)
+        audio = AudioFileClip(self.audio_file)
+        video = VideoFileClip(video_name)
         self.final = video.set_audio(audio)
         self.final.write_videofile("output.mp4", fps=100)
         os.startfile("output.mp4")
