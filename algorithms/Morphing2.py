@@ -1,9 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
+
+import PIL
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 import cv2
-import moviepy.editor as mpe
+#import moviepy.editor as mpe
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 import numpy as np
 from scipy.stats import truncnorm
 import tensorflow_hub as hub
@@ -13,10 +17,12 @@ from concurrent.futures import Future
 import algorithms.MorphingLabels as MorphingLabels
 import tarfile, requests
 import os
-from PIL import ImageTk
+from PIL import ImageTk as itk
 
+tf.disable_v2_behavior()
 # Load compressed models from tensorflow_hub
 os.environ['TFHUB_MODEL_LOAD_FORMAT'] = 'COMPRESSED'
+
 
 def call_with_future(fn, future, args, kwargs):
     try:
@@ -82,8 +88,8 @@ class Morphing2(tk.Frame):
     def option_changed(self, *args):
         image1_path = os.path.join("algorithms", "models", "morphing_imgs", MorphingLabels.get_img(self.image_number_1.get()))
         image2_path = os.path.join("algorithms", "models", "morphing_imgs", MorphingLabels.get_img(self.image_number_2.get()))
-        img1 = ImageTk.PhotoImage(file=image1_path)
-        img2 = ImageTk.PhotoImage(file=image2_path)
+        img1 = itk.PhotoImage(image=PIL.Image.open(image1_path))
+        img2 = itk.PhotoImage(image=PIL.Image.open(image2_path))
         self.preview_image1.config(image=img1)
         self.preview_image1.image = img1
         self.preview_image1.place(x=137, y=280, height=256, width=256)
@@ -213,5 +219,5 @@ class Morphing2(tk.Frame):
             self.video.write(img)
         cv2.destroyAllWindows()
         self.video.release()
-        self.video = mpe.VideoFileClip(video_name)
+        self.video = VideoFileClip(video_name)
         os.startfile("video.avi")

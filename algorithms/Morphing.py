@@ -6,7 +6,7 @@ import cv2
 from tqdm import tqdm
 import numpy as np
 from tkinter.messagebox import showerror
-import moviepy.editor as mpe
+from moviepy.video.io.VideoFileClip import VideoFileClip
 import os
 
 # Load compressed models from tensorflow_hub
@@ -50,11 +50,11 @@ class Morphing(tk.Frame):
         self.image2_file = ''
         self.img1_path = os.path.dirname(os.path.abspath(__file__))
         self.img2_path = os.path.dirname(os.path.abspath(__file__))
-        tk.Button(self, text='Browse image file', font=44, command=self.browse_1image).place(
+        tk.Button(self, text='Browse first image', font=44, command=self.browse_1image).place(
             x=60, y=self.top_padding, height=40, width=400)
         self.label0 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding,
                                                                                      height=40, width=400)
-        tk.Button(self, text='Browse image file', font=44, command=self.browse_2image).place(
+        tk.Button(self, text='Browse second image', font=44, command=self.browse_2image).place(
             x=60, y=self.top_padding + 41, height=40, width=400)
 
         self.label1 = tk.Label(self, text='', font=44, background="lightgrey").place(x=460, y=self.top_padding + 41,
@@ -265,6 +265,6 @@ class Morphing(tk.Frame):
 
         cv2.destroyAllWindows()
         self.video.release()
-        self.video = mpe.VideoFileClip('morph.avi')
+        self.video = VideoFileClip('morph.avi')
         os.startfile("morph.avi")
         print('Result video saved.')
