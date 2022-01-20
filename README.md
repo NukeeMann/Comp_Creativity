@@ -8,4 +8,4 @@ The program consist of algorithms/modules:
 + Slideshow
 + ColorMix
 
-![Program](GUI_AST_2.png)
+![Program](GUI_AST_2.PNG)
